@@ -8,6 +8,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { getParametersAfterDrift } from "./kinematics";
 import "./styles.css";
 
+const DPS = 1;
 const FPS = 60;
 
 const CG0 = {
@@ -51,8 +52,8 @@ class App extends React.Component {
   drift = () => {
     this.setState(
       ({ cg1: cg0, rotation1: rotation0, speedLevel, rotationLevel }) => {
-        const speed = speedMapping[speedLevel];
-        const rotationAmplitude = rotationMapping[rotationLevel];
+        const speed = speedMapping[speedLevel] / DPS;
+        const rotationAmplitude = rotationMapping[rotationLevel] / DPS;
 
         const { cg1, rotation1 } = getParametersAfterDrift({
           cg0,
@@ -69,7 +70,7 @@ class App extends React.Component {
         };
       }
     );
-    this.driftId = setTimeout(this.drift, 1000 / FPS);
+    this.driftId = setTimeout(this.drift, 1000 / DPS);
   };
 
   launch = () => this.drift();
@@ -101,13 +102,8 @@ class App extends React.Component {
       rotationLevel
     } = this.state;
     return (
-      <Grid contatiner direction="column" spacing={40} style={{ width: 800 }}>
-        <Grid
-          item
-          container
-          spacing={16}
-          style={{ marginTop: 32, marginBottom: 32 }}
-        >
+      <Grid container direction="column" spacing={40} style={{ width: 800 }}>
+        <Grid item container spacing={16}>
           <Grid item>
             <TextField
               label="Speed"
@@ -168,6 +164,8 @@ class App extends React.Component {
             rotation0={rotation0}
             cg1={cg1}
             rotation1={rotation1}
+            time={1 / DPS}
+            fps={FPS}
           />
         </Grid>
       </Grid>
