@@ -5,6 +5,7 @@ export const getParametersAfterDrift = ({
   rotationAmplitude
 }) => {
   const randomNumber = 2 * Math.random() - 1;
+  // const rotation1 = rotation0 + rotationAmplitude * randomNumber
   return {
     cg1: {
       x: cg0.x + speed * Math.sin((rotation0 / 180) * Math.PI),
@@ -21,7 +22,7 @@ export const getInterpolatedTrajectory = ({
   rotation1,
   steps = 0
 }) => {
-  return [
+  const trajectory = [
     {
       cg: cg0,
       rotation: rotation0
@@ -41,4 +42,12 @@ export const getInterpolatedTrajectory = ({
       rotation: rotation1
     }
   ];
+  console.log(
+    steps,
+    trajectory,
+    trajectory.length,
+    trajectory[0],
+    trajectory[trajectory.length - 1]
+  );
+  return trajectory;
 };

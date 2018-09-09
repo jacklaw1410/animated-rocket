@@ -2,7 +2,7 @@ import _ from "lodash";
 import React from "react";
 import Rocket from "./Rocket";
 import { getInterpolatedTrajectory } from "./kinematics";
-
+const x = -2;
 class RocketTrajectory extends React.Component {
   state = {
     cg: this.props.cg0,
@@ -12,10 +12,8 @@ class RocketTrajectory extends React.Component {
   trajectoryId = null;
 
   transitAlong = trajetory => {
-    const { time, fps } = this.props;
-    const nextLocation = trajetory.shift(0);
-    // console.log("along", trajetory);
-    // console.log("next", nextLocation);
+    const { fps } = this.props;
+    const nextLocation = trajetory[0];
 
     if (nextLocation) {
       this.setState({
@@ -23,8 +21,8 @@ class RocketTrajectory extends React.Component {
         rotation: nextLocation.rotation
       });
       this.trajectoryId = setTimeout(
-        () => this.transitAlong(trajetory),
-        1000 / fps
+        () => this.transitAlong(trajetory.filter((t, ix) => ix > 0)),
+        1000 / (fps - x)
       );
     }
   };
@@ -33,21 +31,18 @@ class RocketTrajectory extends React.Component {
     if (!_.isEqual(prevProps, this.props)) {
       const { cg0, rotation0, cg1, rotation1, time, fps } = this.props;
       clearTimeout(this.trajectoryId);
-      // this.startTrajectory(this.props);
       const trajectory = getInterpolatedTrajectory({
         cg0,
         rotation0,
         cg1,
         rotation1,
-        steps: Math.floor(fps * time) - 2
+        steps: Math.max(Math.floor(fps * time) - 2, 0)
       });
-      // console.log(Math.floor(fps * time) - 2, trajectory.length, trajectory);
       this.transitAlong(trajectory);
     }
   };
 
   render() {
-    // const { cg0, rotation0, cg1, rotation1 } = this.props;
     const { cg, rotation } = this.state;
     return <Rocket cg={cg} rotation={rotation} />;
   }

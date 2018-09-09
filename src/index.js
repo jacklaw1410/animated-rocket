@@ -8,8 +8,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { getParametersAfterDrift } from "./kinematics";
 import "./styles.css";
 
-const DPS = 1;
-const FPS = 60;
+const DPS = 60;
+const FPS = 1;
 
 const CG0 = {
   x: 400 - 23,
@@ -43,8 +43,8 @@ const rotationMapping = {
 class App extends React.Component {
   state = {
     ...INIT_STATE,
-    speedLevel: "m",
-    rotationLevel: "m"
+    speedLevel: "h",
+    rotationLevel: "h"
   };
 
   driftId = null;
