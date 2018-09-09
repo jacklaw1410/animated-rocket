@@ -7,10 +7,10 @@ export const getParametersAfterDrift = ({
   const randomNumber = 2 * Math.random() - 1;
 
   return {
-    cg: {
+    cg1: {
       x: cg0.x + speed * Math.sin((rotation0 / 180) * Math.PI),
       y: cg0.y + speed * Math.cos((rotation0 / 180) * Math.PI)
     },
-    rotation: rotation0 + rotationAmplitude //* randomNumber
+    rotation1: rotation0 + rotationAmplitude * randomNumber
   };
 };

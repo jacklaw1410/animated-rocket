@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Rocket from "./Rocket";
+import RocketTrajectroy from "./RocketTrajectory";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
@@ -10,12 +10,17 @@ import "./styles.css";
 
 const FPS = 60;
 
+const CG0 = {
+  x: 400 - 23,
+  y: 40
+};
+const ROTATION0 = 0;
+
 const INIT_STATE = {
-  cg: {
-    x: 400 - 23,
-    y: 40
-  },
-  rotation: 0
+  cg0: CG0,
+  rotation0: ROTATION0,
+  cg1: CG0,
+  rotation1: ROTATION0
 };
 
 const speedMapping = {
@@ -45,17 +50,23 @@ class App extends React.Component {
 
   drift = () => {
     this.setState(
-      ({ cg: cg0, rotation: rotation0, speedLevel, rotationLevel }) => {
+      ({ cg1: cg0, rotation1: rotation0, speedLevel, rotationLevel }) => {
         const speed = speedMapping[speedLevel];
         const rotationAmplitude = rotationMapping[rotationLevel];
-        const params = getParametersAfterDrift({
+
+        const { cg1, rotation1 } = getParametersAfterDrift({
           cg0,
           rotation0,
           speed,
           rotationAmplitude
         });
 
-        return params;
+        return {
+          cg0,
+          rotation0,
+          cg1,
+          rotation1
+        };
       }
     );
     this.driftId = setTimeout(this.drift, 1000 / FPS);
@@ -81,7 +92,14 @@ class App extends React.Component {
     });
   };
   render() {
-    const { cg, rotation, speedLevel, rotationLevel } = this.state;
+    const {
+      cg0,
+      rotation0,
+      cg1,
+      rotation1,
+      speedLevel,
+      rotationLevel
+    } = this.state;
     return (
       <Grid contatiner direction="column" spacing={40} style={{ width: 800 }}>
         <Grid
@@ -145,7 +163,12 @@ class App extends React.Component {
             height: 300
           }}
         >
-          <Rocket cg={cg} rotation={rotation} />
+          <RocketTrajectroy
+            cg0={cg0}
+            rotation0={rotation0}
+            cg1={cg1}
+            rotation1={rotation1}
+          />
         </Grid>
       </Grid>
     );
