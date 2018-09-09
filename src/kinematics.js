@@ -1,6 +1,6 @@
 export const getParametersAfterDrift = ({
-  cg: cg0,
-  rotation: rotation0,
+  cg0,
+  rotation0,
   speed,
   rotationAmplitude
 }) => {
@@ -11,6 +11,6 @@ export const getParametersAfterDrift = ({
       x: cg0.x + speed * Math.sin((rotation0 / 180) * Math.PI),
       y: cg0.y + speed * Math.cos((rotation0 / 180) * Math.PI)
     },
-    rotation: rotation0 + rotationAmplitude * randomNumber
+    rotation: rotation0 + rotationAmplitude //* randomNumber
   };
 };

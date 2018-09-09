@@ -8,15 +8,14 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { getParametersAfterDrift } from "./kinematics";
 import "./styles.css";
 
-const FPS = 5;
+const FPS = 60;
+
 const INIT_STATE = {
   cg: {
-    x: 400 - 56,
+    x: 400 - 23,
     y: 40
   },
-  rotation: 0,
-  speedLevel: "m",
-  rotationLevel: "m"
+  rotation: 0
 };
 
 const speedMapping = {
@@ -29,30 +28,36 @@ const speedMapping = {
 
 const rotationMapping = {
   nil: 0,
-  l: 10,
-  m: 60,
+  l: 5,
+  m: 15,
   h: 90,
   insane: 180
 };
 
 class App extends React.Component {
-  state = INIT_STATE;
+  state = {
+    ...INIT_STATE,
+    speedLevel: "m",
+    rotationLevel: "m"
+  };
 
   driftId = null;
 
   drift = () => {
-    this.setState(({ cg, rotation, speedLevel, rotationLevel }) => {
-      const params = getParametersAfterDrift({
-        cg,
-        rotation,
-        speed: speedMapping[speedLevel],
-        rotationAmplitude:
-          rotationMapping[rotationLevel] * (this.driftId % FPS === 0)
-      });
+    this.setState(
+      ({ cg: cg0, rotation: rotation0, speedLevel, rotationLevel }) => {
+        const speed = speedMapping[speedLevel];
+        const rotationAmplitude = rotationMapping[rotationLevel];
+        const params = getParametersAfterDrift({
+          cg0,
+          rotation0,
+          speed,
+          rotationAmplitude
+        });
 
-      // console.log(params);
-      return params;
-    });
+        return params;
+      }
+    );
     this.driftId = setTimeout(this.drift, 1000 / FPS);
   };
 
@@ -140,7 +145,7 @@ class App extends React.Component {
             height: 300
           }}
         >
-          <Rocket cg={cg} rotation={rotation} fps={FPS} />
+          <Rocket cg={cg} rotation={rotation} />
         </Grid>
       </Grid>
     );
