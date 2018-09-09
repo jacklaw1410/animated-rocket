@@ -1,27 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import RocketTrajectroy from "./RocketTrajectory";
+import Rocket from "./Rocket";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
-import { getParametersAfterDrift } from "./kinematics";
+import {
+  getParametersAfterDrift,
+  getInterpolatedTrajectory
+} from "./kinematics";
 import "./styles.css";
 
-const DPS = 60;
-const FPS = 1;
-
-const CG0 = {
-  x: 400 - 23,
-  y: 40
-};
-const ROTATION0 = 0;
+const DPS = 1;
+const FPS = 60;
 
 const INIT_STATE = {
-  cg0: CG0,
-  rotation0: ROTATION0,
-  cg1: CG0,
-  rotation1: ROTATION0
+  cg: {
+    x: 400 - 23,
+    y: 40
+  },
+  rotation: 0
 };
 
 const speedMapping = {
@@ -49,28 +47,50 @@ class App extends React.Component {
 
   driftId = null;
 
+  driftAlong = trajetory => {
+    const nextLocation = trajetory[0];
+
+    if (nextLocation) {
+      this.setState({
+        cg: nextLocation.cg,
+        rotation: nextLocation.rotation
+      });
+      this.driftId = setTimeout(
+        () => this.driftAlong(trajetory.filter((t, ix) => ix > 0)),
+        1000 / FPS
+      );
+    } else {
+      this.drift();
+    }
+  };
+
   drift = () => {
-    this.setState(
-      ({ cg1: cg0, rotation1: rotation0, speedLevel, rotationLevel }) => {
-        const speed = speedMapping[speedLevel] / DPS;
-        const rotationAmplitude = rotationMapping[rotationLevel] / DPS;
+    const {
+      cg: cg0,
+      rotation: rotation0,
+      speedLevel,
+      rotationLevel
+    } = this.state;
 
-        const { cg1, rotation1 } = getParametersAfterDrift({
-          cg0,
-          rotation0,
-          speed,
-          rotationAmplitude
-        });
+    const speed = speedMapping[speedLevel] / DPS;
+    const rotationAmplitude = rotationMapping[rotationLevel] / DPS;
 
-        return {
-          cg0,
-          rotation0,
-          cg1,
-          rotation1
-        };
-      }
-    );
-    this.driftId = setTimeout(this.drift, 1000 / DPS);
+    const { cg1, rotation1 } = getParametersAfterDrift({
+      cg0,
+      rotation0,
+      speed,
+      rotationAmplitude
+    });
+
+    const trajectory = getInterpolatedTrajectory({
+      cg0,
+      rotation0,
+      cg1,
+      rotation1,
+      steps: Math.max(Math.floor(FPS / DPS) - 2, 0)
+    });
+
+    this.driftAlong(trajectory);
   };
 
   launch = () => this.drift();
@@ -93,14 +113,7 @@ class App extends React.Component {
     });
   };
   render() {
-    const {
-      cg0,
-      rotation0,
-      cg1,
-      rotation1,
-      speedLevel,
-      rotationLevel
-    } = this.state;
+    const { cg, rotation, speedLevel, rotationLevel } = this.state;
     return (
       <Grid container direction="column" spacing={40} style={{ width: 800 }}>
         <Grid item container spacing={16}>
@@ -159,14 +172,7 @@ class App extends React.Component {
             height: 300
           }}
         >
-          <RocketTrajectroy
-            cg0={cg0}
-            rotation0={rotation0}
-            cg1={cg1}
-            rotation1={rotation1}
-            time={1 / DPS}
-            fps={FPS}
-          />
+          <Rocket cg={cg} rotation={rotation} />
         </Grid>
       </Grid>
     );
